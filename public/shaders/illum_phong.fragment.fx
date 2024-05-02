@@ -24,6 +24,12 @@ uniform vec3 light_colors[8]; // Ip
 out vec4 FragColor;
 
 void main() {
-    // Color
-    FragColor = vec4(mat_color * texture(mat_texture, model_uv).rgb, 1.0);
+    vec3 light = normalize(light_positions[0] - model_position);
+    vec3 cam = normalize(model_position - camera_position);
+    vec3 norm = normalize(model_normal);
+    
+    vec3 diffuse = clamp(light_colors[0] * dot(norm, light), 0.0, 1.0);
+    vec3 specular = clamp(mat_specular * light_colors[0] * pow(dot(normalize(reflect(light, norm)), cam), mat_shininess), 0.0, 1.0);
+
+    FragColor = vec4(mat_color * (ambient + diffuse + specular) * texture(mat_texture, model_uv).rgb, 1.0);
 }
