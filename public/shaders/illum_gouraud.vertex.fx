@@ -30,15 +30,20 @@ void main() {
     vec3 model_position = (world * vec4(position, 1.0)).xyz;
     vec3 model_normal = (inverse(transpose(mat3(world)))) * normal;
     vec3 norm = normalize(model_normal);
-    vec3 light = normalize(light_positions[0] - model_position);
     vec3 cam = normalize(model_position - camera_position);
-    
-    vec3 diffuse = clamp(light_colors[0] * dot(norm, light), 0.0, 1.0);
-    vec3 specular = clamp(light_colors[0] * pow(dot(normalize(reflect(light, norm)), cam), mat_shininess), 0.0, 1.0);
+    vec3 light;
+    vec3 diffuse;
+    vec3 specular;
+
+    for (int i = 0; i < num_lights; i++) {
+        light = normalize(light_positions[i] - model_position);
+        diffuse += clamp(light_colors[i] * dot(norm, light), 0.0, 1.0);
+        specular += clamp(light_colors[i] * pow(dot(normalize(reflect(light, norm)), cam), mat_shininess), 0.0, 1.0);
+    }
 
     // Pass diffuse and specular illumination onto the fragment shader
-    diffuse_illum = diffuse;
-    specular_illum = specular;
+    diffuse_illum = clamp(diffuse, 0.0, 1.0);
+    specular_illum = clamp(specular, 0.0, 1.0);
 
     // Pass vertex texcoord onto the fragment shader
     model_uv = uv;
