@@ -27,22 +27,14 @@ out vec3 diffuse_illum;
 out vec3 specular_illum;
 
 void main() {
-    vec3 pos = (world * vec4(position, 1.0)).xyz;
-    vec3 n = mat3(transpose(inverse(world))) * normal;
-
-    float ambientStrength = 0.1;
-    vec3 ambient = ambientStrength * light_colors[0];
-
-    vec3 norm = normalize(n);
-    vec3 light = normalize(light_positions[0] - pos);
-    float diff = max(dot(norm, light), 0.0);
-    vec3 diffuse = diff * light_colors[0];
-
-    float specularStrength = 1.0;
-    vec3 viewDir = normalize(camera_position - pos);
-    vec3 reflectDir = reflect(-light, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-    vec3 specular = specularStrength * spec * light_colors[0];
+    vec3 model_position = (world * vec4(position, 1.0)).xyz;
+    vec3 model_normal = (inverse(transpose(mat3(world)))) * normal;
+    vec3 norm = normalize(model_normal);
+    vec3 light = normalize(light_positions[0] - model_position);
+    vec3 cam = normalize(model_position - camera_position);
+    
+    vec3 diffuse = clamp(light_colors[0] * dot(norm, light), 0.0, 1.0);
+    vec3 specular = clamp(light_colors[0] * pow(dot(normalize(reflect(light, norm)), cam), mat_shininess), 0.0, 1.0);
 
     // Pass diffuse and specular illumination onto the fragment shader
     diffuse_illum = diffuse;
