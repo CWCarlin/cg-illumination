@@ -109,6 +109,29 @@ class Renderer {
         box.material = materials['illum_' + this.shading_alg];
         current_scene.models.push(box);
 
+        
+        scene.onKeyboardObservable.add((key_press) => {
+            switch (key_press.event.key) {
+                case 'w':
+                    current_scene.lights[this.active_light].position.addInPlace(new Vector3(0.0, 0.0, -0.5));
+                    break;
+                case 'a':
+                    current_scene.lights[this.active_light].position.addInPlace(new Vector3(-0.5, 0.0, 0.0));
+                    break;
+                case 's':
+                    current_scene.lights[this.active_light].position.addInPlace(new Vector3(0.0, 0.0, 0.5));
+                    break;
+                case 'd':
+                    current_scene.lights[this.active_light].position.addInPlace(new Vector3(0.5, 0.0, 0.0));
+                    break;
+                case 'r':
+                    current_scene.lights[this.active_light].position.addInPlace(new Vector3(0.0, 0.5, 0.0));
+                    break;
+                case 'f':
+                    current_scene.lights[this.active_light].position.addInPlace(new Vector3(0.0, -0.5, 0.0));
+                    break;
+            }
+        });
 
         // Animation function - called before each frame gets rendered
         scene.onBeforeRenderObservable.add(() => {
