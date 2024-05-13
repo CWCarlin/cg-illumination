@@ -7,6 +7,7 @@ import { Texture } from '@babylonjs/core/Materials/Textures/texture';
 import { RawTexture } from '@babylonjs/core/Materials/Textures/rawTexture';
 import { Color3, Color4 } from '@babylonjs/core/Maths/math.color';
 import { Vector2, Vector3 } from '@babylonjs/core/Maths/math.vector';
+import { Mesh, StandardMaterial, VertexData } from '@babylonjs/core';
 
 const BASE_URL = import.meta.env.BASE_URL || '/';
 
@@ -108,6 +109,83 @@ class Renderer {
         }
         box.material = materials['illum_' + this.shading_alg];
         current_scene.models.push(box);
+
+        
+        // Create custom mesh
+        let triangleMesh = new Mesh('triangleMesh', scene);
+        let vertexData = new VertexData();
+        let vertices = [
+            new Vector3(0, 0, 0),
+            new Vector3(1, 0, 0),
+            new Vector3(1, 1, 0),
+            new Vector3(0, 1, 0),
+            
+            new Vector3(0.5, 0.5, 1),
+            new Vector3(0.25, 0.25, 2),
+            new Vector3(0.75, 0.25, 2),
+            new Vector3(0.75, 0.75, 2),
+            new Vector3(0.25, 0.75, 2),
+            new Vector3(0.5, 0.5, 3),
+            
+            new Vector3(0.5, 0.25, 1),
+            new Vector3(0.75, 0.5, 1),
+            new Vector3(0.5, 0.75, 1),
+            new Vector3(0.25, 0.5, 1),
+            
+            new Vector3(0.75, 0.25, 1),
+            new Vector3(0.75, 0.75, 1),
+            
+            new Vector3(0.5, 0.75, 1),
+            
+            new Vector3(0.25, 0.75, 1),
+            new Vector3(0.25, 0.25, 1),
+            new Vector3(0.5, 0.25, 1)
+        ];
+        let indices = [
+            0, 1, 2,
+            0, 2, 3,
+            
+            4, 5, 6,
+            4, 6, 7,
+            4, 7, 8,
+            4, 8, 9,
+            
+            0, 1, 10,
+            1, 2, 11,
+            2, 3, 12,
+            3, 0, 13,
+            1, 11, 10,
+            2, 12, 11,
+            3, 13, 12,
+            0, 10, 13,
+            2, 4, 14,
+            4, 5, 14,
+            5, 6, 14,
+            6, 7, 14,
+            7, 8, 14,
+            8, 9, 14,
+            9, 4, 14,
+            4, 9, 5,
+        ];
+        vertexData.positions = vertices.map(v => v.x).concat(vertices.map(v => v.y), vertices.map(v => v.z));
+        vertexData.indices = indices;
+        vertexData.applyToMesh(triangleMesh);
+        // Customize the appearance of the triangle
+        triangleMesh.metadata = {
+            mat_color: new Color3(0.20, 0.45, 0.50),
+            mat_texture: white_texture,
+            mat_specular: new Color3(0.4, 0.4, 0.4),
+            mat_shininess: 5,
+            texture_scale: new Vector2(1.0, 1.0)
+        }
+        box.material = materials['illum_' + this.shading_alg];
+        triangleMesh.scaling = new Vector3(5, 5, 5); // Make it larger
+        let triangleMaterial = new StandardMaterial('triangleMaterial', scene);
+        //triangleMaterial.diffuseColor = new Color3(0.20, 0.45, 0.50); // Set the color
+        // Apply the material to the mesh
+        triangleMesh.material = triangleMaterial;
+        // Add the triangle mesh to the scene
+        current_scene.models.push(triangleMesh);
 
         
         scene.onKeyboardObservable.add((key_press) => {
