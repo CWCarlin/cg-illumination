@@ -200,7 +200,7 @@ class Renderer {
             mat_shininess: 5,
             texture_scale: new Vector2(1.0, 1.0)
         }
-        box.material = materials['illum_' + this.shading_alg];
+        triangleMesh.material = materials['illum_' + this.shading_alg];
         triangleMesh.scaling = new Vector3(5, 5, 5); // Make it larger
         let triangleMaterial = new StandardMaterial('triangleMaterial', scene);
         //triangleMaterial.diffuseColor = new Color3(0.20, 0.45, 0.50); // Set the color
