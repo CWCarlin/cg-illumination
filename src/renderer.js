@@ -190,42 +190,40 @@ class Renderer {
             4, 9, 5,
         ];
         
-        // Calculate normals
-    let normals = [];
-    for (let i = 0; i < vertices.length; i++) {
-        normals.push(Vector3.Zero());
-    }
-
-    // Calculate face normals and add to vertex normals
-    for (let i = 0; i < indices.length; i += 3) {
-        let i1 = indices[i];
-        let i2 = indices[i + 1];
-        let i3 = indices[i + 2];
-
-        let v1 = vertices[i1];
-        let v2 = vertices[i2];
-        let v3 = vertices[i3];
-
-        let edge1 = v2.subtract(v1);
-        let edge2 = v3.subtract(v1);
-        let normal = Vector3.Cross(edge1, edge2).normalize();
-
-        // Add face normal to vertex normals
-        normals[i1] = normals[i1].add(normal);
-        normals[i2] = normals[i2].add(normal);
-        normals[i3] = normals[i3].add(normal);
-    }
-
-    // Normalize vertex normals
-    for (let i = 0; i < normals.length; i++) {
-        normals[i] = normals[i].normalize();
-    }
-
-    // Assign normals to vertexData
-    vertexData.normals = normals.map(v => v.x).concat(normals.map(v => v.y), normals.map(v => v.z));
+        let normals = [];
+        for (let i = 0; i < vertices.length; i++) {
+            normals.push(Vector3.Zero());
+        }
 
 
+        for (let i = 0; i < indices.length; i += 3) {
+            let i1 = indices[i];
+            let i2 = indices[i + 1];
+            let i3 = indices[i + 2];
+
+            let v1 = vertices[i1];
+            let v2 = vertices[i2];
+            let v3 = vertices[i3];
+
+            let edge1 = v2.subtract(v1);
+            let edge2 = v3.subtract(v1);
+            let normal = Vector3.Cross(edge1, edge2).normalize();
+
+
+            normals[i1] = normals[i1].add(normal);
+            normals[i2] = normals[i2].add(normal);
+            normals[i3] = normals[i3].add(normal);
+        }
+
+
+        for (let i = 0; i < normals.length; i++) {
+            normals[i] = normals[i].normalize();
+        }
+
+
+        
         vertexData.positions = vertices.map(v => v.x).concat(vertices.map(v => v.y), vertices.map(v => v.z));
+        vertexData.normals = normals.map(v => v.x).concat(normals.map(v => v.y), normals.map(v => v.z));
         vertexData.indices = indices;
         vertexData.applyToMesh(triangleMesh);
         // Customize the appearance of the triangle
