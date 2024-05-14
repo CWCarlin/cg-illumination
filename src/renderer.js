@@ -189,6 +189,42 @@ class Renderer {
             9, 4, 14,
             4, 9, 5,
         ];
+        
+        // Calculate normals
+    let normals = [];
+    for (let i = 0; i < vertices.length; i++) {
+        normals.push(Vector3.Zero());
+    }
+
+    // Calculate face normals and add to vertex normals
+    for (let i = 0; i < indices.length; i += 3) {
+        let i1 = indices[i];
+        let i2 = indices[i + 1];
+        let i3 = indices[i + 2];
+
+        let v1 = vertices[i1];
+        let v2 = vertices[i2];
+        let v3 = vertices[i3];
+
+        let edge1 = v2.subtract(v1);
+        let edge2 = v3.subtract(v1);
+        let normal = Vector3.Cross(edge1, edge2).normalize();
+
+        // Add face normal to vertex normals
+        normals[i1] = normals[i1].add(normal);
+        normals[i2] = normals[i2].add(normal);
+        normals[i3] = normals[i3].add(normal);
+    }
+
+    // Normalize vertex normals
+    for (let i = 0; i < normals.length; i++) {
+        normals[i] = normals[i].normalize();
+    }
+
+    // Assign normals to vertexData
+    vertexData.normals = normals.map(v => v.x).concat(normals.map(v => v.y), normals.map(v => v.z));
+
+
         vertexData.positions = vertices.map(v => v.x).concat(vertices.map(v => v.y), vertices.map(v => v.z));
         vertexData.indices = indices;
         vertexData.applyToMesh(triangleMesh);
@@ -202,14 +238,9 @@ class Renderer {
         }
         triangleMesh.material = materials['illum_' + this.shading_alg];
         triangleMesh.scaling = new Vector3(5, 5, 5); // Make it larger
-        let triangleMaterial = new StandardMaterial('triangleMaterial', scene);
-        //triangleMaterial.diffuseColor = new Color3(0.20, 0.45, 0.50); // Set the color
-        // Apply the material to the mesh
-        triangleMesh.material = triangleMaterial;
-        // Add the triangle mesh to the scene
         current_scene.models.push(triangleMesh);
 
-        
+    
         scene.onKeyboardObservable.add((key_press) => {
             switch (key_press.event.key) {
                 case 'w':
@@ -239,6 +270,7 @@ class Renderer {
             // ...
 
             // update uniforms in shader programs
+
             this.updateShaderUniforms(scene_idx, materials['illum_' + this.shading_alg]);
             this.updateShaderUniforms(scene_idx, materials['ground_' + this.shading_alg]);
         });
